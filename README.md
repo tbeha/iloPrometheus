@@ -13,15 +13,15 @@ The ILO Redfish connector is a Python script that utilizes the HPE ILO Redfish P
 
 | File          | Description                     |
 |---------------|-------------------------------|
-| iloPromConnector.v1.0.py | ILO Redfish Connector for Prometheus Python script |
-| createILOcredentials.v1.0.py | Python script to create the Kubernetes configmap (<Name>.yml), the encryption key file (<Name>.key) and the configuration parameter file (<Name>.xml). |
+| [iloPromConnector.v1.0.py](https://github.com/tbeha/iloPrometheus/blob/main/iloPromConnector.v1.0.py) | ILO Redfish Connector for Prometheus Python script |
+| [createILOcredentials.v1.0.py](https://github.com/tbeha/iloPrometheus/blob/main/createILOcredentials.v1.0.py) | Python script to create the Kubernetes configmap (<Name>.yml), the encryption key file (<Name>.key) and the configuration parameter file (<Name>.xml). |
 | README.md  | This readme file |
-| License    | GPL-3.0 license |
-| JupyterNotebooks | Example Jupyter Notebook  |
-| JupyterNotebooks/ILO-Redfish.ipynb  | Jupyter Notebook example for a Kubernetes pod deployment of the ILO Redfish Connector for Prometheus |
-| JupyterNoteboosk/iloprometheus.Dockerfile | Dockerfile to build a ILO Redfish Connector for Prometheus container image |
-| GrafanaDashboards | Grafana Dashboard Examples |
-  | GrafanaDashboards/Power Consumption-1655219362362.json | Power consumption dashboard |
-  | GrafanaDashboards/Temperature Overview-1655219338454.json | Temperature overview dashboard |
-  | GrafanaDashboards/Temperature Details-1655219598166.json  | Temperature details dashboard |
+| [License](https://github.com/tbeha/iloPrometheus/blob/main/LICENSE)    | GPL-3.0 license |
+| __JupyterNotebooks__ | Example Jupyter Notebooks  |
+| [JupyterNotebooks/ILO-Redfish.ipynb](https://github.com/tbeha/iloPrometheus/blob/main/JupyterNotebooks/ILO-Redfish.ipynb)  | Jupyter Notebook example for a Kubernetes pod deployment of the ILO Redfish Connector for Prometheus |
+| [JupyterNoteboosk/iloprometheus.Dockerfile](https://github.com/tbeha/iloPrometheus/blob/main/JupyterNotebooks/iloprometheus.Dockerfile) | Dockerfile to build a ILO Redfish Connector for Prometheus container image |
+| __GrafanaDashboards__ | Grafana Dashboard Examples |
+  | [GrafanaDashboards/Power Consumption-1655219362362.json](https://github.com/tbeha/iloPrometheus/blob/main/GrafanaDashboards/Power%20Consumption-1655219362362.json) | Power consumption dashboard |
+  | [GrafanaDashboards/Temperature Overview-1655219338454.json](https://github.com/tbeha/iloPrometheus/blob/main/GrafanaDashboards/Temperature%20Details-1655219598166.json) | Temperature overview dashboard |
+  | [GrafanaDashboards/Temperature Details-1655219598166.json](https://github.com/tbeha/iloPrometheus/blob/main/GrafanaDashboards/Temperature%20Overview-1655219338454.json)  | Temperature details dashboard |
 
