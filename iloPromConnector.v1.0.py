@@ -109,8 +109,8 @@ if __name__ == "__main__":
     
     """ read the key and input file""" 
 
-    path = '.'
-    #path = '/opt/prometheus/data' 
+    #path = '.'
+    path = '/opt/prometheus/data' 
     keyfile = path + '/iloprometheus.key'  
     xmlfile = path + '/iloprometheus.xml'
 
