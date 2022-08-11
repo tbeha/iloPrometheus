@@ -88,15 +88,13 @@ def get_server_urls( login_account, login_password, ilos, lfile):
                 if '#Thermal.' in instance ['@odata.type']:
                     server["Thermal"]=instance['@odata.id']
             server_urls[ilo.text]=server
-        except ServerDownOrUnreachableError as ex:
-            sys.stderr.write("ERROR: server not reachable or does not support RedFish.\n")
+        except Exception as ex:
             log=logopen(lfile)
-            logwriter(log,'Exception')
+            logwriter(log,'Exception - get_server_urls: '+ilo.text)
             logwriter(log,str(ex))
             logclose(log)
+            server_urls[ilo.text]=server
             pass
-
-
     return server_urls;
 
 def get_server_data( login_account, login_password, server, lfile):
@@ -118,8 +116,8 @@ def get_server_data( login_account, login_password, server, lfile):
         REDFISHOBJ.logout()
         return server_data;
     
-    except ServerDownOrUnreachableError as ex:
-        sys.stderr.write("ERROR: server not reachable or does not support RedFish.\n")
+    except Exception as ex:
+        sys.stderr.write("ERROR during get_server_date: "+server["url"])
         log=logopen(lfile)
         logwriter(log,'Exception')
         logwriter(log,str(ex))
