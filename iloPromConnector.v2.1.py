@@ -81,19 +81,21 @@ def get_server_urls( login_account, login_password, ilos, lfile):
             resource_instances = get_resource_directory(REDFISHOBJ, lfile)
             REDFISHOBJ.logout()
             for instance in resource_instances:
-                if '#ComputerSystem.' in instance ['@odata.type']:
+                if '#ComputerSystem.' in instance['@odata.type']:
                     server["ComputerSystem"]=instance['@odata.id'] 
                 if '#Power.' in instance ['@odata.type']:
                     server["Power"]=instance['@odata.id'] 
                 if '#Thermal.' in instance ['@odata.type']:
                     server["Thermal"]=instance['@odata.id']
-            server_urls[ilo.text]=server
+            if len(server)> 2: 
+                server_urls[ilo.text]=server
         except Exception as ex:
             log=logopen(lfile)
             logwriter(log,'Exception - get_server_urls: '+ilo.text)
             logwriter(log,str(ex))
             logclose(log)
-            server_urls[ilo.text]=server
+            if len(server)> 2:
+                server_urls[ilo.text]=server
             pass
     return server_urls;
 
@@ -124,9 +126,10 @@ def get_server_data( login_account, login_password, server, lfile):
         logclose(log)        
         pass
 
-def display_results( node, inode, server_metrics):
-    cn = (server_metrics['System']['HostName']).split('.')[0].replace('-','_')
-    inode.labels(cn).info({"Model":server_metrics['System']["Model"],"Manufacturer":server_metrics['System']["Manufacturer"],"SerialNumber":server_metrics['System']["SerialNumber"]})
+def display_results( node, inode, server_metrics, server_ip):
+    hostname = (server_metrics['System']['HostName']).split('.')[0].replace('-','_')
+    cn = server_ip
+    inode.labels(cn).info({"Model":server_metrics['System']["Model"],"Manufacturer":server_metrics['System']["Manufacturer"],"SerialNumber":server_metrics['System']["SerialNumber"],"Hostname":hostname})
     node.labels(cn,'Power','State').set(power_state[server_metrics['System']["PowerState"]]) 
     node.labels(cn,'Power','Average').set(server_metrics["PowerMeter"]['Average'])           
     node.labels(cn,'Power','Maximum').set(server_metrics["PowerMeter"]['Maximum'])
@@ -187,7 +190,7 @@ if __name__ == "__main__":
             c.inc()
             for server in monitor_urls:
                 server_metrics = get_server_data(user, password, monitor_urls[server], lfile)
-                display_results(node, inode, server_metrics)
+                display_results(node, inode, server_metrics, server)
             t1 = time.time()
             delta.set((t1-t0))
             while ((t1-t0) < mintervall):
