@@ -16,6 +16,7 @@
  #        added the temperature state = enabled filter
 
 # -*- coding: utf-8 -*-
+from math import log1p
 from cryptography.fernet import *
 from lxml import etree 
 import time
@@ -101,7 +102,9 @@ def get_server_urls( login_account, login_password, ilos, lfile):
 
 def get_server_data( login_account, login_password, server, lfile):
 
-    print("Debug - Get Server Data: ",server["url"])
+    log = logopen(lfile)
+    logwriter(log,"Debug - Get Server Data: "+server["url"])
+    logclose(log)
     server_data={}
     try:
         # Create a Redfish client object
@@ -130,7 +133,9 @@ def get_server_data( login_account, login_password, server, lfile):
 def display_results( node, inode, server_metrics, server_ip):
     hostname = (server_metrics['System']['HostName']).split('.')[0].replace('-','_')
     cn = server_ip
-    print("Debug - Display: "+cn)
+    log = logopen(lfile)
+    logwriter(log,"Debug - Display "+cn)
+    logclose(log)
     inode.labels(cn).info({"Model":server_metrics['System']["Model"],"Manufacturer":server_metrics['System']["Manufacturer"],"SerialNumber":server_metrics['System']["SerialNumber"],"Hostname":hostname})
     node.labels(cn,'Power','State').set(power_state[server_metrics['System']["PowerState"]]) 
     node.labels(cn,'Power','Average').set(server_metrics["PowerMeter"]['Average'])           
@@ -148,8 +153,8 @@ if __name__ == "__main__":
     
     """ read the key and input file""" 
 
-    #path = '.'
-    path = '/opt/prometheus/data' 
+    path = '.'
+    #path = '/opt/prometheus/data' 
     keyfile = path + '/iloprometheus.key'  
     xmlfile = path + '/iloprometheus.xml'
 
@@ -172,9 +177,11 @@ if __name__ == "__main__":
     ilos=tree.findall("ILO_ip")  # List of all ILOs
 
     # Get the monitoring URLs of the server
-    print("Debug: get monitor_urls")
     monitor_urls = get_server_urls(user, password, ilos, lfile)
-    print("Debug",monitor_urls)
+    log = logopen(lfile)
+    logwriter(log,"Debug - monitor_urls")
+    logwriter(log,str(monitor_urls))
+    logclose(log)
 
     # open the logfile
     log=logopen(lfile)
