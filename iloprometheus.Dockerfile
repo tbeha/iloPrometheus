@@ -18,5 +18,5 @@ RUN /usr/bin/pip3 install requests && \
 	/usr/bin/pip3 install prometheus_client
 # copy the necessary python files to the container
 RUN mkdir /opt/prometheus
-COPY ./iloPromConnector.v3.0.py /opt/prometheus
+COPY ./iloPromConnector.v3.1.py /opt/prometheus
 
