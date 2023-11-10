@@ -122,7 +122,7 @@ def get_server_data( login_account, login_password, server, lfile):
     except Exception as ex:
         sys.stderr.write("ERROR during get_server_date: "+server["url"])
         if ex.status == 401:
-            REDFISHOBJ = RedfishClient(base_url=server["url"], username=login_account, password=login_password)
+            REDFISHOBJ = redfish.redfish_client(base_url=server["url"], username=login_account, password=login_password)
             REDFISHOBJ.login()
             server["redfish"] = REDFISHOBJ
         log=logopen(lfile)
