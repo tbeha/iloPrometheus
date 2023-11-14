@@ -30,6 +30,7 @@ from lxml import etree
 import time
 from datetime import datetime
 from prometheus_client import Counter, Gauge, start_http_server, Info
+from icmplib import ping
 import sys
 import redfish
 
@@ -79,30 +80,36 @@ def get_server_urls( login_account, login_password, server, lfile):
     for s in server:
         ilo_url="https://"+s['ilo']
         s["url"]=ilo_url
-        try:
-            # Create a Redfish client object
-            REDFISHOBJ = redfish.redfish_client(base_url=ilo_url, username=login_account, password=login_password)  
-            # Login with the Redfish client
-            REDFISHOBJ.login()
-            s["redfish"]=REDFISHOBJ
-            resource_instances = get_resource_directory(REDFISHOBJ, lfile)
-            for instance in resource_instances:
-                if '#ComputerSystem.' in instance ['@odata.type']:
-                    s["ComputerSystem"]=instance['@odata.id'] 
-                if '#Power.' in instance ['@odata.type']:
-                    s["Power"]=instance['@odata.id'] 
-                if '#Thermal.' in instance ['@odata.type']:
-                    s["Thermal"]=instance['@odata.id']
-            if len(s) > 4:
-                server_urls[s['ilo']]=s
-        except Exception as ex:
+        response=ping(address=s['ilo'],count=2)
+        if( response.is_alive ):
+            try:
+                # Create a Redfish client object
+                REDFISHOBJ = redfish.redfish_client(base_url=ilo_url, username=login_account, password=login_password)  
+                # Login with the Redfish client
+                REDFISHOBJ.login()
+                s["redfish"]=REDFISHOBJ
+                resource_instances = get_resource_directory(REDFISHOBJ, lfile)
+                for instance in resource_instances:
+                    if '#ComputerSystem.' in instance ['@odata.type']:
+                        s["ComputerSystem"]=instance['@odata.id'] 
+                    if '#Power.' in instance ['@odata.type']:
+                        s["Power"]=instance['@odata.id'] 
+                    if '#Thermal.' in instance ['@odata.type']:
+                        s["Thermal"]=instance['@odata.id']
+                if len(s) > 4:
+                    server_urls[s['ilo']]=s
+            except Exception as ex:
+                log=logopen(lfile)
+                logwriter(log,'Exception - get_server_urls: '+s['ilo'])
+                logwriter(log,str(ex.__context__))
+                logclose(log)
+                if len(s) > 4:
+                    server_urls[s['ilo']]=s
+                pass
+        else:
             log=logopen(lfile)
-            logwriter(log,'Exception - get_server_urls: '+s['ilo'])
-            logwriter(log,str(ex.__context__))
+            logwriter(log,'Exception - ILO is not reachable: '+s['ilo'])
             logclose(log)
-            if len(s) > 4:
-                server_urls[s['ilo']]=s
-            pass
     return server_urls;
 
 def get_server_data( login_account, login_password, server, lfile):
@@ -144,10 +151,9 @@ def display_results( node, inode, server_metrics, server):
             node.labels(cn,server['Rack'],'Temperature',temperature["Name"]).set(temperature['ReadingCelsius'])
     return 0
 
-if __name__ == "__main__":
-
+def getServerList():
+    result={}
     """ read the key and input file""" 
-
     #path = '.'
     path = '/opt/prometheus/data' 
     keyfile = path + '/iloprometheus.key'  
@@ -164,25 +170,31 @@ if __name__ == "__main__":
     u2=(tree.find("user")).text
     p2=(tree.find("password")).text
     f = Fernet(key2)
-    user = f.decrypt(u2.encode('ASCII')).decode('ASCII')
-    password = f.decrypt(p2.encode('ASCII')).decode('ASCII')
-    lfile=path+(tree.find("logfile")).text
-    port=int((tree.find("port")).text)
-    mintervall = int((tree.find("monitoringintervall")).text) 
+    result['user'] = f.decrypt(u2.encode('ASCII')).decode('ASCII')
+    result['password'] = f.decrypt(p2.encode('ASCII')).decode('ASCII')
+    result['lfile'] =path+(tree.find("logfile")).text
+    result['port'] =int((tree.find("port")).text)
+    result['mintervall'] = int((tree.find("monitoringintervall")).text) 
     #sx=tree.findall("server")  # List of all server
     server=[]
     for s in tree.findall("server"):
         server.append({"ilo":s.find("ILO_ip").text,"Rack":s.find("Rack").text,"Loc":s.find("Loc").text})
+    result['server'] = server
+    return result
+
+if __name__ == "__main__":
+
+    input = getServerList()    
 
     # Get the monitoring URLs of the server
-    monitor_urls = get_server_urls(user, password, server, lfile)
+    monitor_urls = get_server_urls(input['user'], input['password'], input['server'], input['lfile'])
 
     # open the logfile
-    log=logopen(lfile)
+    log=logopen(input['lfile'])
     logwriter(log,"Started ILO Prometheus Connector Test")
 
     # Start the http_server and the counters, gauges
-    start_http_server(port)
+    start_http_server(input['port'])
     c = Counter('ilorest_sample','ILO REST sample number')
     node = Gauge('ilorest_node','ILO Node Data',['nodename','rack','nodemetric','metricdetail'])
     delta = Gauge('ConnectorRuntime','Time required for last data collection in seconds')
@@ -190,19 +202,25 @@ if __name__ == "__main__":
 
     # Start the endless loop
     while True: 
-        t0 = time.time()         
+        t0 = time.time()
+        start0 = t0         
         for server in monitor_urls:
             try:
-                server_metrics = get_server_data(user, password, monitor_urls[server], lfile)
+                server_metrics = get_server_data(input['user'], input['password'], monitor_urls[server], input['lfile'])
                 display_results(node, inode, server_metrics, monitor_urls[server])
             except Exception as ex:
-                log=logopen(lfile)
+                log=logopen(input['lfile'])
                 logwriter(log,'Exception')
                 logwriter(log,str(ex.__context__))
                 logclose(log)
                 pass
         t1 = time.time()
         delta.set((t1-t0))
-        while ((t1-t0) < mintervall):
+        while ((t1-t0) < input['mintervall']):
             time.sleep(1.0)
-            t1 = time.time()    
+            t1 = time.time()   
+        # update once per day the input
+        if ( t1 - start0 > 42200):
+            start0 = t1
+            input = getServerList() 
+            monitor_urls = get_server_urls(input['user'], input['password'], input['server'], input['lfile'])
