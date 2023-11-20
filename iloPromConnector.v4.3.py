@@ -30,9 +30,16 @@ from lxml import etree
 import time
 from datetime import datetime
 from prometheus_client import Counter, Gauge, start_http_server, Info
-from icmplib import ping
 import sys
 import redfish
+
+LINUX=False
+
+if LINUX:
+    import os
+else:
+    from icmplib import ping
+
 
 BtoGB=pow(1024,3)
 BtoMB=pow(1024,2)
@@ -76,12 +83,22 @@ def get_resource_directory(redfishobj, lfile):
 def get_server_urls( login_account, login_password, server, lfile):
 
     server_urls={}
-
+    if LINUX:
+        cmd='ping -c 2 '
+    log=logopen(lfile)
+    logwriter(log,'get_server_urls')
     for s in server:
         ilo_url="https://"+s['ilo']
         s["url"]=ilo_url
-        response=ping(address=s['ilo'],count=2)
-        if( response.is_alive ):
+        if LINUX:
+            response=os.system(cmd+s['ilo'])   # works on Linux without root priviliges
+        else:
+            response = ping(address=s['ilo'],count=1)  # requires root priviliges on Linux
+            if(response.is_alive):
+                response = 0
+            else:
+                response = 256
+        if (response == 0):        
             try:
                 # Create a Redfish client object
                 REDFISHOBJ = redfish.redfish_client(base_url=ilo_url, username=login_account, password=login_password)  
@@ -98,19 +115,17 @@ def get_server_urls( login_account, login_password, server, lfile):
                         s["Thermal"]=instance['@odata.id']
                 if len(s) > 4:
                     server_urls[s['ilo']]=s
+                    logwriter(log,s['ilo']+' completed')
             except Exception as ex:
-                log=logopen(lfile)
                 logwriter(log,'Exception - get_server_urls: '+s['ilo'])
                 logwriter(log,str(ex.__context__))
-                logclose(log)
                 if len(s) > 4:
                     server_urls[s['ilo']]=s
                 pass
         else:
-            log=logopen(lfile)
             logwriter(log,'Exception - ILO is not reachable: '+s['ilo'])
-            logclose(log)
-    return server_urls;
+    logclose(log)
+    return server_urls
 
 def get_server_data( login_account, login_password, server, lfile):
 
@@ -153,9 +168,11 @@ def display_results( node, inode, server_metrics, server):
 
 def getServerList():
     result={}
-    """ read the key and input file""" 
-    #path = '.'
-    path = '/opt/prometheus/data' 
+    """ read the key and input file"""
+    if(LINUX):
+        path = '/opt/prometheus/data'
+    else:
+        path = '.'
     keyfile = path + '/iloprometheus.key'  
     xmlfile = path + '/iloprometheus.xml'
 
@@ -192,6 +209,7 @@ if __name__ == "__main__":
     # open the logfile
     log=logopen(input['lfile'])
     logwriter(log,"Started ILO Prometheus Connector Test")
+    logclose(log)
 
     # Start the http_server and the counters, gauges
     start_http_server(input['port'])
@@ -201,9 +219,13 @@ if __name__ == "__main__":
     inode = Info('node','Additional Node Info',['node'])
 
     # Start the endless loop
+    log=logopen(input['lfile'])
+    logwriter(log,"Start Loop")
+    logclose(log)   
     while True: 
         t0 = time.time()
-        start0 = t0         
+        start0 = t0
+        c.inc()      
         for server in monitor_urls:
             try:
                 server_metrics = get_server_data(input['user'], input['password'], monitor_urls[server], input['lfile'])
@@ -224,3 +246,6 @@ if __name__ == "__main__":
             start0 = t1
             input = getServerList() 
             monitor_urls = get_server_urls(input['user'], input['password'], input['server'], input['lfile'])
+            log=logopen(input['lfile'])
+            logwriter(log,'Updated Monitor URL List')
+            logclose(log)
