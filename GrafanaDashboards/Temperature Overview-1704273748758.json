@@ -7,28 +7,61 @@
       "type": "datasource",
       "pluginId": "prometheus",
       "pluginName": "Prometheus"
+    },
+    {
+      "name": "DS_PROMETHEUS-FOR-LIBRARY-PANEL",
+      "label": "Prometheus",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "prometheus",
+      "pluginName": "Prometheus",
+      "usage": {
+        "libraryPanels": [
+          {
+            "name": "Dashboards",
+            "uid": "lsgNgbD7z"
+          }
+        ]
+      }
     }
   ],
-  "__elements": [
-    {
+  "__elements": {
+    "lsgNgbD7z": {
       "name": "Dashboards",
       "uid": "lsgNgbD7z",
       "kind": 1,
       "model": {
         "datasource": {
           "type": "prometheus",
-          "uid": "${DS_PROMETHEUS}"
+          "uid": "${DS_PROMETHEUS-FOR-LIBRARY-PANEL}"
         },
         "description": "",
-        "gridPos": {
-          "h": 25,
-          "w": 2,
-          "x": 0,
-          "y": 0
+        "libraryPanel": {
+          "description": "",
+          "meta": {
+            "connectedDashboards": 9,
+            "created": "2022-05-16T11:47:17Z",
+            "createdBy": {
+              "avatarUrl": "/avatar/ff505d09c4074b9aafcd9bb136fd8f99",
+              "id": 2,
+              "name": "thomasb"
+            },
+            "folderName": "General",
+            "folderUid": "",
+            "updated": "2022-05-16T11:47:17Z",
+            "updatedBy": {
+              "avatarUrl": "/avatar/ff505d09c4074b9aafcd9bb136fd8f99",
+              "id": 2,
+              "name": "thomasb"
+            }
+          },
+          "name": "Dashboards",
+          "type": "dashlist",
+          "uid": "lsgNgbD7z",
+          "version": 1
         },
-        "id": 2,
         "options": {
-          "maxItems": 10,
+          "maxItems": 20,
           "query": "",
           "showHeadings": true,
           "showRecentlyViewed": false,
@@ -36,13 +69,22 @@
           "showStarred": true,
           "tags": []
         },
-        "pluginVersion": "8.5.2",
+        "pluginVersion": "9.0.4",
         "tags": [],
         "title": "Dashboards",
-        "type": "dashlist"
+        "type": "dashlist",
+        "targets": [
+          {
+            "refId": "A",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "-jysRDXnz"
+            }
+          }
+        ]
       }
     }
-  ],
+  },
   "__requires": [
     {
       "type": "panel",
@@ -51,22 +93,22 @@
       "version": ""
     },
     {
-      "type": "panel",
-      "id": "dashlist",
-      "name": "Dashboard list",
-      "version": ""
-    },
-    {
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "8.5.2"
+      "version": "10.2.0"
     },
     {
       "type": "datasource",
       "id": "prometheus",
       "name": "Prometheus",
       "version": "1.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "timeseries",
+      "name": "Time series",
+      "version": ""
     }
   ],
   "annotations": {
@@ -95,16 +137,10 @@
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "id": null,
-  "iteration": 1655219327580,
   "links": [],
   "liveNow": false,
   "panels": [
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "description": "",
       "gridPos": {
         "h": 25,
         "w": 2,
@@ -113,42 +149,117 @@
       },
       "id": 2,
       "libraryPanel": {
-        "description": "",
-        "meta": {
-          "connectedDashboards": 8,
-          "created": "2022-05-16T11:47:17Z",
-          "createdBy": {
-            "avatarUrl": "/avatar/ff505d09c4074b9aafcd9bb136fd8f99",
-            "id": 2,
-            "name": "thomasb"
-          },
-          "folderName": "General",
-          "folderUid": "",
-          "updated": "2022-05-16T11:47:17Z",
-          "updatedBy": {
-            "avatarUrl": "/avatar/ff505d09c4074b9aafcd9bb136fd8f99",
-            "id": 2,
-            "name": "thomasb"
-          }
-        },
-        "name": "Dashboards",
-        "type": "dashlist",
         "uid": "lsgNgbD7z",
-        "version": 1
+        "name": "Dashboards"
+      }
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
       },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "#EAB839",
+                "value": 30
+              },
+              {
+                "color": "red",
+                "value": 35
+              }
+            ]
+          },
+          "unit": "celsius"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 24,
+        "w": 21,
+        "x": 2,
+        "y": 0
+      },
+      "id": 10,
       "options": {
-        "maxItems": 10,
-        "query": "",
-        "showHeadings": true,
-        "showRecentlyViewed": false,
-        "showSearch": true,
-        "showStarred": true,
-        "tags": []
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "min",
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "sortBy": "Last *",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
       },
-      "pluginVersion": "8.5.2",
-      "tags": [],
-      "title": "Dashboards",
-      "type": "dashlist"
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "ilorest_node{metricdetail=\"01-Inlet Ambient\"}   ",
+          "instant": false,
+          "legendFormat": "{{nodename}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Inlet Ambient Temperature",
+      "type": "timeseries"
     },
     {
       "datasource": {
@@ -181,16 +292,17 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 25,
+        "h": 12,
         "w": 7,
         "x": 2,
-        "y": 0
+        "y": 24
       },
       "id": 8,
       "options": {
         "displayMode": "basic",
         "minVizHeight": 10,
         "minVizWidth": 0,
+        "namePlacement": "auto",
         "orientation": "horizontal",
         "reduceOptions": {
           "calcs": [
@@ -199,9 +311,10 @@
           "fields": "",
           "values": false
         },
-        "showUnfilled": true
+        "showUnfilled": true,
+        "valueMode": "color"
       },
-      "pluginVersion": "8.5.2",
+      "pluginVersion": "10.2.0",
       "targets": [
         {
           "datasource": {
@@ -249,16 +362,17 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 25,
+        "h": 12,
         "w": 7,
         "x": 9,
-        "y": 0
+        "y": 24
       },
       "id": 6,
       "options": {
         "displayMode": "basic",
         "minVizHeight": 10,
         "minVizWidth": 0,
+        "namePlacement": "auto",
         "orientation": "horizontal",
         "reduceOptions": {
           "calcs": [
@@ -267,9 +381,10 @@
           "fields": "",
           "values": false
         },
-        "showUnfilled": true
+        "showUnfilled": true,
+        "valueMode": "color"
       },
-      "pluginVersion": "8.5.2",
+      "pluginVersion": "10.2.0",
       "targets": [
         {
           "datasource": {
@@ -277,13 +392,13 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "ilorest_node{metricdetail=\"02-CPU 1\"}",
+          "expr": "ilorest_node{metricdetail=\"54-P/S 1 Inlet\"}",
           "legendFormat": "{{nodename}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "02-CPU 1",
+      "title": "54-P/S 1 Inlet",
       "type": "bargauge"
     },
     {
@@ -317,16 +432,17 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 25,
+        "h": 12,
         "w": 7,
         "x": 16,
-        "y": 0
+        "y": 24
       },
       "id": 7,
       "options": {
         "displayMode": "basic",
         "minVizHeight": 10,
         "minVizWidth": 0,
+        "namePlacement": "auto",
         "orientation": "horizontal",
         "reduceOptions": {
           "calcs": [
@@ -335,9 +451,10 @@
           "fields": "",
           "values": false
         },
-        "showUnfilled": true
+        "showUnfilled": true,
+        "valueMode": "color"
       },
-      "pluginVersion": "8.5.2",
+      "pluginVersion": "10.2.0",
       "targets": [
         {
           "datasource": {
@@ -345,19 +462,18 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "ilorest_node{metricdetail=\"03-CPU 2\"}",
+          "expr": "ilorest_node{metricdetail=\"55-P/S 2 Inlet\"}",
           "legendFormat": "{{nodename}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "03-CPU 2",
+      "title": "55-P/S 2 Inlet",
       "type": "bargauge"
     }
   ],
   "refresh": "10s",
-  "schemaVersion": 36,
-  "style": "dark",
+  "schemaVersion": 38,
   "tags": [],
   "templating": {
     "list": [
@@ -382,6 +498,6 @@
   "timezone": "",
   "title": "Temperature Overview",
   "uid": "FBhTrtX7z",
-  "version": 7,
+  "version": 11,
   "weekStart": ""
 }
