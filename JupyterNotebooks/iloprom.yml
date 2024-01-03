@@ -1,0 +1,23 @@
+apiVersion: v1 
+kind: ConfigMap 
+metadata: 
+  name: iloprom1-xml 
+  namespace: svtprometheus 
+data: 
+  iloprometheus.key: |- 
+    LVkjkV5j40Fl67ratU0RDf5W1NmAE0oqoQ2DaE74=
+  iloprometheus.xml: |- 
+    <data> 
+      <username>Prom</username>
+      <user>gAAAAABig6ZJgR7v5AFjsOKiYt0bwqBdledJpF3-TnUBR5NttG8P-O_eYA55-5NyyZgmmeWRnWy3hPAbUFk18_sWNw==</user>
+      <password>gAAAAABig6ZJAZVWo17JysUq0-k5VjnrNUCU1y5AAPw5p1MphkFcB_u6z0TgcPbmR9yJcX39Cx0Egwv5Lou8A==</password>
+      <monitoringintervall>30</monitoringintervall>
+      <logfile>iloprometheus.log</logfile>
+      <port>9091</port>
+      <server> <ILO_ip>10.1.40.5</ILO_ip>,<Rack>i5</Rack>,<Loc>16</Loc> </server>
+      <server> <ILO_ip>10.1.40.6</ILO_ip>,<Rack>i5</Rack>,<Loc>14</Loc> </server>  
+      <server> <ILO_ip>10.1.40.7</ILO_ip>,<Rack>i5</Rack>,<Loc>19</Loc> </server> 
+      <server> <ILO_ip>10.1.40.8</ILO_ip>,<Rack>i5</Rack>,<Loc>18</Loc> </server>      
+      <server> <ILO_ip>10.1.24.66</ILO_ip>,<Rack>C5</Rack>,<Loc>30</Loc> </server>     
+      <server> <ILO_ip>10.0.43.14</ILO_ip>,<Rack>i12</Rack>,<Loc>9</Loc> </server>
+    </data>
